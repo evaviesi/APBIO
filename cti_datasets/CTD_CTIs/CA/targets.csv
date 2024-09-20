@@ -1,0 +1,12 @@
+GeneID,UniProtKB,Protein_Names,Gene_Names,Organism,Length
+765,P23280,Carbonic anhydrase 6 (EC 4.2.1.1) (Carbonate dehydratase VI) (Carbonic anhydrase VI) (CA-VI) (Salivary carbonic anhydrase) (Secreted carbonic anhydrase),CA6,Homo sapiens (Human),308
+766,P43166,Carbonic anhydrase 7 (EC 4.2.1.1) (Carbonate dehydratase VII) (Carbonic anhydrase VII) (CA-VII),CA7,Homo sapiens (Human),264
+11238,Q9Y2D0,"Carbonic anhydrase 5B, mitochondrial (EC 4.2.1.1) (Carbonate dehydratase VB) (Carbonic anhydrase VB) (CA-VB)",CA5B,Homo sapiens (Human),317
+377677,Q8N1Q1,Carbonic anhydrase 13 (EC 4.2.1.1) (Carbonate dehydratase XIII) (Carbonic anhydrase XIII) (CA-XIII),CA13,Homo sapiens (Human),262
+763,P35218,"Carbonic anhydrase 5A, mitochondrial (EC 4.2.1.1) (Carbonate dehydratase VA) (Carbonic anhydrase VA) (CA-VA)",CA5A CA5,Homo sapiens (Human),305
+762,P22748,Carbonic anhydrase 4 (EC 4.2.1.1) (Carbonate dehydratase IV) (Carbonic anhydrase IV) (CA-IV),CA4,Homo sapiens (Human),312
+771,O43570,Carbonic anhydrase 12 (EC 4.2.1.1) (Carbonate dehydratase XII) (Carbonic anhydrase XII) (CA-XII) (Tumor antigen HOM-RCC-3.1.3),CA12,Homo sapiens (Human),354
+761,P07451,Carbonic anhydrase 3 (EC 4.2.1.1) (Carbonate dehydratase III) (Carbonic anhydrase III) (CA-III),CA3,Homo sapiens (Human),260
+759,P00915,Carbonic anhydrase 1 (EC 4.2.1.1) (Carbonate dehydratase I) (Carbonic anhydrase B) (CAB) (Carbonic anhydrase I) (CA-I) (Cyanamide hydratase CA1) (EC 4.2.1.69),CA1,Homo sapiens (Human),261
+760,P00918,Carbonic anhydrase 2 (EC 4.2.1.1) (Carbonate dehydratase II) (Carbonic anhydrase C) (CAC) (Carbonic anhydrase II) (CA-II) (Cyanamide hydratase CA2) (EC 4.2.1.69),CA2,Homo sapiens (Human),260
+768,Q16790,Carbonic anhydrase 9 (EC 4.2.1.1) (Carbonate dehydratase IX) (Carbonic anhydrase IX) (CA-IX) (CAIX) (Membrane antigen MN) (P54/58N) (Renal cell carcinoma-associated antigen G250) (RCC-associated antigen G250) (pMW1),CA9 G250 MN,Homo sapiens (Human),459

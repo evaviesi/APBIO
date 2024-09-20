@@ -1,0 +1,66 @@
+/* main menu */
+#MainMenu {
+    visibility: hidden;
+}
+
+/* deploy button */
+.stDeployButton {
+    visibility: hidden;
+}
+
+/* title font size */
+h1#apbio { 
+    font-size: 50px;
+}
+
+/* text font size */
+div[data-testid="stText"] {   
+    font-size: 16px; 
+}
+
+/* paragraph style */
+div[data-testid="stMarkdownContainer"] > p {   
+    font-size: 16px; 
+}
+
+div[data-testid="stMarkdownContainer"] > ol > li {   
+    margin: 0; 
+    text-align: justify;
+}
+
+/* radio button widget */
+div.row-widget.stRadio > div { 
+    flex-direction: row; 
+    gap: 0.8rem;
+
+}
+
+div.row-widget.stRadio > div > :first-child {
+    display: none;
+}
+
+/* hint button */
+div.stButton > button[kind="primary"] {
+    background: none;
+    color: #0068c9;
+    text-decoration: underline;
+    border: none;
+    cursor: pointer;
+}
+
+/* footer */
+footer {
+    visibility: hidden;
+}
+
+div.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f1f1f1;
+    color: black;
+    text-align: center;
+    padding: 10px;
+    margin-left: 200px;
+}
