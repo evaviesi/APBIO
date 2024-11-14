@@ -5,6 +5,7 @@
 import os
 import random
 import pickle
+import gzip
 import numpy as np
 import pandas as pd
 
@@ -160,9 +161,9 @@ def sign_proj(dataset_name, df, nn_dct, seed=SEED):
     datasets_path = "/../../cti_datasets/AP_CTIs/sampled"
 
     # read dataset
-    with open(
+    with gzip.open(
         curr_dir + datasets_path + "/" + dataset_name + 
-        "_sampled_CT_ds.pkl", "rb") as f:
+        "_sampled_CT_ds.pkl.gz", "rb") as f:
         X = pickle.load(f)
         y = pickle.load(f)
     f.close()
