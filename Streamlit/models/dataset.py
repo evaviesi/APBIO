@@ -95,7 +95,9 @@ def generate_dataset(ct_pairs, target_desc, dataset_name,
         for model in models:
             print(model)
             # load signaturizer 
-            sign = Signaturizer(model)
+            sign = Signaturizer(
+                curr_dir + "/signaturizers/" + model, local=True, 
+                verbose=True)
             x = sign.predict(smiles)
             pred_sign.append(x.signature)
         pred_sign = np.concatenate(pred_sign, axis=1)
@@ -182,7 +184,9 @@ def generate_dataset(ct_pairs, target_desc, dataset_name,
         for model in models:
             print(model)
             # load signaturizer 
-            sign = Signaturizer(model)
+            sign = Signaturizer(
+                curr_dir + "/signaturizers/" + model, local=True, 
+                verbose=True)
             x = sign.predict(smiles)
             pred_sign.append(x.signature)
         pred_sign = np.concatenate(pred_sign, axis=1)

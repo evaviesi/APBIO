@@ -39,6 +39,11 @@ div.row-widget.stRadio > div > :first-child {
     display: none;
 }
 
+/* checkbox widget */
+div.row-widget.stCheckbox > label {   
+    margin-right: -10rem;
+}
+
 /* hint button */
 div.stButton > button[kind="primary"] {
     background: none;

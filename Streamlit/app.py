@@ -375,7 +375,7 @@ def main():
         <li><b>MFP</b>: Morgan fingerprints (1024 bits, radius 2);</li> 
         <li><b>APchem</b>: fingerprint bits and counts, molecular descriptors, 
         and quantum properties;</li> 
-        <li><b>CCchem</b>: space of 2D and 3D fingerprints, scaffolds, 
+        <li><b>CCchem</b>: 2D and 3D fingerprints, scaffolds, 
         structural keys, and physicochemical parameters.</li></ul>
         ''', 
         unsafe_allow_html=True
@@ -384,7 +384,7 @@ def main():
     st.sidebar.markdown(
         '''<div style='text-align: justify; margin-bottom: 12px;'>
         Users can download the compound-target interaction dataset,
-        visualize the two-dimensional (2D) projection of the signatures of the 
+        visualize the two-dimensional (2D) t-SNE projection of the signatures of the 
         query compound and its 5 nearest neighbors (NN), and retrieve the 
         prediction results.</div>
         ''', 
@@ -442,7 +442,7 @@ def main():
             <li>Wait for the results to be displayed.</li> 
             <li>Inspect the compound-target interaction dataset and the 
             applicability domain of the compound and the target.</li>
-            <li>Visually inspect the 2D TSNE projection of compound 
+            <li>Visually inspect the 2D t-SNE projection of compound 
             signatures.</li>
             <li>(Optional) Download the compound-target interaction dataset
             as a XLSX file via the "Download datasets" button.</li>
@@ -523,7 +523,7 @@ def main():
             applicability domain. For each compound are reported its 5 nearest 
             neighbors (NN) together with the average cosine distance between
             compound signatures. The same applies to targets. If single 
-            interaction is selected, the 2D TSNE projection 
+            interaction is selected, the 2D t-SNE projection 
             of compound signatures is displayed. Each signature vector is 
             colored according to the group it belongs to.</div>
             ''', 
@@ -736,7 +736,7 @@ def main():
             spaces = []
             st.write("3\. Select one or more bioactivity spaces to generate "
                      "the compound-target vector and run the prediction:")
-            c1, c2, c3, c4, c5, c6 = st.columns(6)
+            c1, c2, c3, c4, c5, c6, c7 = st.columns(6)
             if c1.checkbox('F1F2')  : spaces.append('F1F2')
             if c2.checkbox('A1A2')  : spaces.append('A1A2')
             if c3.checkbox('MFP')   : spaces.append('MFP')
@@ -745,6 +745,8 @@ def main():
             
             # define button 
             c6.button("Run", on_click=click_button)
+            # define slider
+            tsne_option = c7.select_slider("2D t-SNE:", ["Hide", "Show"])
             if st.session_state.clicked:
                 # query for compound name
                 r_name = pd.read_csv(
@@ -820,20 +822,23 @@ def main():
                                  .format(precision=3, subset=['5NN_DIST']))
                                                                     
                     # show figure 
-                    st.write("#")
-                    st.markdown('''<div style='text-align: center;'>
-                        2D TSNE projection of compound signatures</div>
-                        ''', 
-                        unsafe_allow_html=True)
-                    # configuration
-                    config = {
-                        'modeBarButtonsToRemove': 
-                        ['logo', 'zoom', 'tableRotation','lasso', 'select2d',
-                         'autoscale', 'orbitRotation', 'pan', 
-                         'resetCameraLastSave'], 'displaylogo': False
-                    }
-                    st.plotly_chart(fig, config=config, 
-                                    use_container_width=True)
+                    if tsne_option == "Show":
+                        # generate projections
+                        fig = sign_proj(space, pred_df, ad_dct)
+                        st.write("#")
+                        st.markdown('''<div style='text-align: center;'>
+                            2D t-SNE projection of compound signatures</div>
+                            ''', 
+                            unsafe_allow_html=True)
+                        # configuration
+                        config = {
+                            'modeBarButtonsToRemove': 
+                            ['logo', 'zoom', 'tableRotation','lasso', 'select2d',
+                            'autoscale', 'orbitRotation', 'pan', 
+                            'resetCameraLastSave'], 'displaylogo': False
+                        }
+                        st.plotly_chart(fig, config=config, 
+                                        use_container_width=True)
 
                 if spaces:
                     # save datasets
