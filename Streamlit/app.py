@@ -736,7 +736,7 @@ def main():
             spaces = []
             st.write("3\. Select one or more bioactivity spaces to generate "
                      "the compound-target vector and run the prediction:")
-            c1, c2, c3, c4, c5, c6, c7 = st.columns(6)
+            c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
             if c1.checkbox('F1F2')  : spaces.append('F1F2')
             if c2.checkbox('A1A2')  : spaces.append('A1A2')
             if c3.checkbox('MFP')   : spaces.append('MFP')
