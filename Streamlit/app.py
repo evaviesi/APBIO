@@ -191,15 +191,25 @@ def change_tg_style(tg_id, style):
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def generate_cti_vec(selected_space, mol_id, inchikey, tg_id):  
-    """Generate compound-target interaction vector."""
+def generate_target_vec(tg_id):
 
     # create tmp directory
     tmp_dir = os.getcwd() + "/tmp"
     if not os.path.exists(tmp_dir): os.makedirs(tmp_dir) 
 
     # extract target sequence features
-    target_feat = extract_features([tg_id], tmp_dir)
+    target_vec = extract_features([tg_id], tmp_dir)
+
+    return target_vec
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def generate_cti_vec(selected_space, mol_id, inchikey, tg_id, target_vec):  
+    """Generate compound-target interaction vector."""
+
+    # create tmp directory
+    tmp_dir = os.getcwd() + "/tmp"
+    if not os.path.exists(tmp_dir): os.makedirs(tmp_dir) 
      
     # create dataframe
     cti_df = pd.DataFrame({"InChIkey"  : [inchikey], 
@@ -207,7 +217,7 @@ def generate_cti_vec(selected_space, mol_id, inchikey, tg_id):
                            }, index = [mol_id])
     
     # generate dataset 
-    X, pairs = generate_dataset(cti_df, target_feat, selected_space, tmp_dir)
+    X, pairs = generate_dataset(cti_df, target_vec, selected_space, tmp_dir)
     y = [(k, v) for k in pairs.keys() for v in pairs[k]]
     pred_df = pd.DataFrame(X, index=y)
 
@@ -764,8 +774,11 @@ def main():
                 datasets = []
                 res = []
                 for i, space in enumerate(spaces): 
+                    # generate target vector
+                    target_df = generate_target_vec(tg_id)
                     # generate compound-target vector 
-                    pred_df = generate_cti_vec(space, mol_id, inchikey, tg_id)
+                    pred_df = generate_cti_vec(space, mol_id, inchikey, 
+                                               tg_id, target_df)
                     datasets.append(pred_df)
                     # define applicability domain 
                     ad_dct = search_out_ad(space, pred_df) 
