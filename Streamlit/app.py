@@ -190,26 +190,15 @@ def change_tg_style(tg_id, style):
     return tg_id
 
 
-@st.cache_data(ttl=300, show_spinner=False)
-def generate_target_vec(tg_id):
+def generate_cti_vec(selected_space, mol_id, inchikey, tg_id):  
+    """Generate compound-target interaction vector."""
 
     # create tmp directory
     tmp_dir = os.getcwd() + "/tmp"
     if not os.path.exists(tmp_dir): os.makedirs(tmp_dir) 
 
     # extract target sequence features
-    target_vec = extract_features([tg_id], tmp_dir)
-
-    return target_vec
-
-
-@st.cache_data(ttl=300, show_spinner=False)
-def generate_cti_vec(selected_space, mol_id, inchikey, tg_id, target_vec):  
-    """Generate compound-target interaction vector."""
-
-    # create tmp directory
-    tmp_dir = os.getcwd() + "/tmp"
-    if not os.path.exists(tmp_dir): os.makedirs(tmp_dir) 
+    target_feat = extract_features([tg_id], tmp_dir)
      
     # create dataframe
     cti_df = pd.DataFrame({"InChIkey"  : [inchikey], 
@@ -217,7 +206,7 @@ def generate_cti_vec(selected_space, mol_id, inchikey, tg_id, target_vec):
                            }, index = [mol_id])
     
     # generate dataset 
-    X, pairs = generate_dataset(cti_df, target_vec, selected_space, tmp_dir)
+    X, pairs = generate_dataset(cti_df, target_feat, selected_space, tmp_dir)
     y = [(k, v) for k in pairs.keys() for v in pairs[k]]
     pred_df = pd.DataFrame(X, index=y)
 
@@ -771,36 +760,16 @@ def main():
                 symbol = ast.literal_eval(r_symbol.text)
                 symbol = symbol["genes"][0]["geneName"]["value"]
 
-                datasets = []
-                res = []
-                for i, space in enumerate(spaces): 
-                    # generate target vector
-                    target_df = generate_target_vec(tg_id)
+                datasets = {}
+                res = {}
+                for space in spaces: 
                     # generate compound-target vector 
-                    pred_df = generate_cti_vec(space, mol_id, inchikey, 
-                                               tg_id, target_df)
-                    datasets.append(pred_df)
+                    pred_df = generate_cti_vec(space, mol_id, inchikey, tg_id)
+                    datasets[space] = pred_df
                     # define applicability domain 
                     ad_dct = search_out_ad(space, pred_df) 
-                    applicability_df = pd.concat([
-                        pd.DataFrame(list(ad_dct["mol"].values())), 
-                        pd.DataFrame(list(ad_dct["tg"].values()))])
-                    applicability_df.index = [list(ad_dct["mol"].keys()) + \
-                                              list(ad_dct["tg"].keys())]
-                    applicability_df.columns = ["DOMAIN", "5NN_DIST", "5NN_KEYS"]
-                    # generate projections
-                    fig = sign_proj(space, pred_df, ad_dct)
                     # run predictions 
                     result_df = run_prediction(space, pred_df)
-                    # generate output dataframe 
-                    out_df = pd.DataFrame(pd.concat([result_df.iloc[0],
-                                                     applicability_df.iloc[0]
-                                                     .add_prefix("COMPOUND_"), 
-                                                     applicability_df.iloc[1]
-                                                     .add_prefix("TARGET_")])).T
-                    out_df.index = [(inchikey, tg_id)]
-                    out_df.index.name = "Compound: %s - Target: %s"%(name, symbol) 
-                    res.append(out_df)              
 
                     # show dataset
                     st.write("#")
@@ -816,7 +785,7 @@ def main():
                         pred_df.style
                         .set_properties(**{"background-color": "#ffe3c9"})
                         .format(precision=4))
-                    
+
                     # show applicability  
                     st.write("#") 
                     st.markdown(
@@ -825,6 +794,13 @@ def main():
                         ''', 
                         unsafe_allow_html=True
                     )  
+                    cols = ["DOMAIN", "5NN_DIST", "5NN_KEYS"]
+                    applicability_df = pd.concat([
+                    pd.DataFrame(list(ad_dct["mol"].values())), 
+                    pd.DataFrame(list(ad_dct["tg"].values()))])
+                    applicability_df.index = [list(ad_dct["mol"].keys()) + \
+                                              list(ad_dct["tg"].keys())]
+                    applicability_df.columns = cols
                     st.dataframe(applicability_df.style 
                                  .applymap(lambda _: "background-color: #eeffff",
                                            subset=([inchikey], slice(None))) 
@@ -833,7 +809,7 @@ def main():
                                  .applymap(lambda x: 'color: #ff8b8b' if \
                                            x=="out" else '', subset=['DOMAIN'])
                                  .format(precision=3, subset=['5NN_DIST']))
-                                                                    
+                                                                               
                     # show figure 
                     if tsne_option == "Show":
                         # generate projections
@@ -852,32 +828,43 @@ def main():
                         }
                         st.plotly_chart(fig, config=config, 
                                         use_container_width=True)
-
+                
+                    # output dataframe 
+                    out_df = pd.DataFrame(pd.concat([result_df.iloc[0],
+                                                     applicability_df.iloc[0]
+                                                     .add_prefix("COMPOUND_"), 
+                                                     applicability_df.iloc[1]
+                                                     .add_prefix("TARGET_")])).T
+                    out_df.index = [(inchikey, tg_id)]
+                    out_df.index.name = "Compound: %s - Target: %s"%(name, symbol) 
+                    res[space] = out_df   
+                
                 if spaces:
                     # save datasets
                     ds_buffer = io.BytesIO()
                     with pd.ExcelWriter(ds_buffer, engine="xlsxwriter") as w:
-                        for i, space in enumerate(spaces):
-                            datasets[i].to_excel(w, sheet_name=space)
+                            for space in spaces:
+                                datasets[space].to_excel(w, sheet_name=space)
                     # download datasets   
                     st.download_button(label="Download datasets",
                                        data=ds_buffer,
                                        file_name = "datasets.xlsx",
                                        mime="application/vnd.ms-excel")
-
-                    # save and show results   
+                
+                
+                    # save and show results 
                     st.write("#")
                     st.subheader("Prediction results:")
                     res_buffer = io.BytesIO()
                     with pd.ExcelWriter(res_buffer, engine="xlsxwriter") as w:
-                        for i, space in enumerate(spaces): 
-                            res[i].to_excel(w, sheet_name=space)
+                        for space in spaces: 
+                            res[space].to_excel(w, sheet_name=space)
                             st.markdown(
                                 f'''<p style='font-size:20px;'>{space}</p>''', 
                                 unsafe_allow_html=True
                             )
                             st.dataframe(
-                                res[i].iloc[:,0:2].style.applymap(
+                                res[space].iloc[:,0:2].style.applymap(
                                     lambda x: "background-color: #ffd3c9" if x==0 \
                                     else "background-color: #e8f9ee", 
                                     subset=["MODEL_PREDICTION"]
